@@ -21,7 +21,9 @@ public class ServerInit {
             //debugger
             System.out.println(">" + line);
             //indicate end of request or header, add body later
-            if(line.equals("\r\n")) {
+            if(line.equals("\\r\\n")) {
+                //debugger
+                System.out.println("End of request");
                 break;
             }
         }
