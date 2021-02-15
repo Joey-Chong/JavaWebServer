@@ -2,6 +2,7 @@ package Server;
 import java.net.*;
 import java.io.*;
 import java.util.HashMap;
+import Settings.ConfSettings;
 
 public class ServerInit {
     ParseHttpRequest parser;
@@ -10,15 +11,14 @@ public class ServerInit {
     //if possible, change the way IOException is thrown or caught
     public ServerInit() throws IOException {
         System.out.println("Server started");
-        System.out.println("Preparing Mime Type");
-        ContentTypeInit contentTypes = new ContentTypeInit();
         System.out.println("Starting Server");
         System.out.println("------------------------------------------");
         start();
     }
 
     private void start() throws IOException {
-        ServerSocket socket = new ServerSocket(8080);   //this is default
+        int listenPort = Integer.parseInt(ConfSettings.getValue("Listen").get(0));
+        ServerSocket socket = new ServerSocket(listenPort);   //this is default
         Socket client = null;
 
         while(true) {
