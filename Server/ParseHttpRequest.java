@@ -18,13 +18,13 @@ public class ParseHttpRequest {
 
     private void parseRequest(Socket client) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-        String line = null;
+        String line;
         System.out.println("------- Header -------");
 
         System.out.println("------- Method -------");
         line = reader.readLine();
         System.out.println(">" + line);
-        String methodLine[] = line.split(" ");
+        String[] methodLine = line.split(" ");
         if(methodLine.length != 3) {
             System.out.println("Invalid method line");
             System.exit(1);
@@ -46,7 +46,7 @@ public class ParseHttpRequest {
             headerMap.put(headerLine[0], headerLine[1]);
 
             //if no Content-Length is given from client or server, it indicates there is no body
-            if((line == null) || line.equals("\\r\\n")) {
+            if(line.equals("\\r\\n")) {
                 //debugger
                 System.out.println("------- End of header -------");
                 break;
