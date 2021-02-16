@@ -2,44 +2,38 @@ package Server;
 import java.net.*;
 import java.io.*;
 import java.util.HashMap;
-import Settings.ConfSettings;
+import java.util.ArrayList;
+import Dictionaries.ConfSettings;
 
 public class ServerInit {
     ParseHttpRequest parser;
-    HttpResponse responser;
+    HttpResponse responder;
 
     //if possible, change the way IOException is thrown or caught
     public ServerInit() throws IOException {
         System.out.println("Server started");
         System.out.println("Starting Server");
         System.out.println("------------------------------------------");
-        start();
     }
 
-    private void start() throws IOException {
-        int listenPort = Integer.parseInt(ConfSettings.getValue("Listen").get(0));
-        ServerSocket socket = new ServerSocket(listenPort);   //this is default
+    public void start(String port) throws IOException {
+        ServerSocket socket = null;
+        try {
+            int intPort = Integer.parseInt(port);
+            socket = new ServerSocket(intPort);
+        } catch (NumberFormatException exception) {  
+            int defaultPort = Integer.parseInt(ConfSettings.getValue("Listen").get(0));
+            socket = new ServerSocket(defaultPort);
+        }
         Socket client = null;
 
         while(true) {
             client = socket.accept();
             parser = new ParseHttpRequest(client);
-            responser = new HttpResponse(parser);
-//            readRequest(client);
-//            sendResponse(client);
+            parser.handleRequest();
+            responder = new HttpResponse(client, parser);
+            responder.respond();
             client.close();
         }
-    }
-
-    //will be moved, this is just a prototype
-    private void sendResponse(Socket client) throws IOException {
-        PrintWriter out = new PrintWriter(client.getOutputStream(), true);
-        System.out.println("Sending response");
-        out.print("HTTP/1.1 404 Not found\r\n");
-//        out.print("HTTP/1.1 401 Unauthorized\r\n");
-//        out.print("WWW-Authenticate: Basic\r\n");
-        out.print("\r\n");
-        out.flush();
-        System.out.println("Sent");
     }
 }

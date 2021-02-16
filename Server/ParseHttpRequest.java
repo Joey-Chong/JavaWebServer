@@ -4,20 +4,25 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 public class ParseHttpRequest {
     private String method;
     private String identifier;
     private String version;
     private HashMap headerMap;
+    private String statusCode;
+    private String contentType;
+    private String contentLength;
+    private String responseBody;
     private String body;
+    private BufferedReader reader;
 
     public ParseHttpRequest(Socket client) throws IOException {
-        parseRequest(client);
+        reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
     }
 
-    private void parseRequest(Socket client) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+    public void handleRequest() throws IOException {
         String line;
         System.out.println("------- Header -------");
 
@@ -33,6 +38,7 @@ public class ParseHttpRequest {
         identifier = methodLine[1];
         version = methodLine[2];
         version.replace("\\r\\n", "");
+
 //        for(String m: methodLine) {
 //            System.out.println(m);
 //        }
@@ -67,6 +73,8 @@ public class ParseHttpRequest {
         else {
             System.out.println("------- No Body Present -------");
         }
+
+        return;
     }
 
     public String getMethod() {
@@ -75,6 +83,22 @@ public class ParseHttpRequest {
 
     public String getIdentifier() {
         return this.identifier;
+    }
+
+    public String getStatusCode() {
+        return this.statusCode;
+    }
+
+    public String getContentType() {
+        return this.contentType;
+    }
+
+    public String getContentLength() {
+        return this.contentLength;
+    }
+
+    public String getResponseBody() {
+        return this.responseBody;
     }
 
     public String getVersion() {

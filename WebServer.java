@@ -1,5 +1,4 @@
-import Settings.ConfSettings;
-import Settings.MimeSettings;
+import Dictionaries.*;
 import Server.ServerInit;
 
 import java.io.IOException;
@@ -12,7 +11,13 @@ public class WebServer {
     try {
         ConfSettings.init();
         MimeSettings.init();
+        ResponseDictionary.init();
         ServerInit server = new ServerInit();
+        try {
+            server.start(args[0]);
+        } catch (ArrayIndexOutOfBoundsException exception) {
+            server.start(null);
+        } 
     } catch (IOException exception) {
         System.out.println("**** "+exception);
     } 

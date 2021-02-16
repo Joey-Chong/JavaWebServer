@@ -1,4 +1,4 @@
-package Settings;
+package Dictionaries;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
