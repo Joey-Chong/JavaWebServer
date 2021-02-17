@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.ArrayList;
 import Dictionaries.ResponseDictionary;
 
 public class ParseHttpRequest {
@@ -14,10 +13,11 @@ public class ParseHttpRequest {
     private HashMap<String, String> headerMap;
     private String statusCode;
     private String contentType;
-    private String contentLength;
+    private int contentLength;
     private String responseBody;
     private String body;
     private BufferedReader reader;
+    private boolean hasBody;
 
     public ParseHttpRequest(Socket client) throws IOException {
         reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -25,7 +25,6 @@ public class ParseHttpRequest {
 
     public void handleRequest() throws IOException {
         String line;
-        System.out.println("------- Header -------");
 
         System.out.println("------- Method -------");
         line = reader.readLine();
@@ -35,8 +34,7 @@ public class ParseHttpRequest {
         if(methodLine.length != 3 && !methodLine[0].matches("GET|HEAD|POST|PUT|DELETE")) {
             statusCode = "400";
             printStatusCode(statusCode);
-            //change to connection: close maybe?
-            System.exit(1);
+            return;
         }
 
         method = methodLine[0];
@@ -46,8 +44,7 @@ public class ParseHttpRequest {
         if(!version.equals(ResponseDictionary.getSupportedVersion())) {
             statusCode = "400";
             printStatusCode(statusCode);
-            //change to connection: close maybe?
-            System.exit(1);
+            return;
         }
 
         String[] headerLine;
@@ -56,42 +53,52 @@ public class ParseHttpRequest {
         while((line = reader.readLine()).length() != 0) {
             System.out.println(">" + line);
 
-            headerLine = line.split(": ");
-            headerMap.put(headerLine[0], headerLine[1]);
-
             //if no Content-Length is given from client or server, it indicates there is no body
             if(line.equals("\\r\\n")) {
                 //debugger
                 System.out.println("------- End of header -------");
                 break;
             }
+
+            headerLine = line.split(": ");
+            headerMap.put(headerLine[0], headerLine[1]);
         }
 
         if(headerMap.containsKey("Content-Type") && headerMap.containsKey("Content-Length")) {
-            body = null;
+            String bodyReader;
+            contentType = headerMap.get("Content-Type");
+            contentLength = Integer.parseInt(headerMap.get("Content-Length"));
+            body = "";
+            hasBody = true;
+
             System.out.println("------- Body -------");
-            while ((body = reader.readLine()) != null) {
-                System.out.println(">" + body);
-                if (body.equals("\\r\\n")) {
+            while ((bodyReader = reader.readLine()) != null) {
+                System.out.println(">" + bodyReader);
+                if (bodyReader.equals("\\r\\n")) {
                     break;
+                }
+                else {
+                    body = body + bodyReader + "\n";
                 }
             }
             System.out.println("------- End of Body -------");
+            if(body.length() != contentLength) {
+                System.out.println("------- Body length does not match Content-Length -------");
+                statusCode = "400";
+                return;
+            }
+            System.out.println(body);
         }
         else {
+            hasBody = false;
             System.out.println("------- No Body Present -------");
         }
-
-//        ---------- To print out key value pair of the headerMap ----------
-//        System.out.println("----- Header Map Key-Value Pair -----");
-//        for(String key : headerMap.keySet()){
-//            System.out.println(key + ": " + headerMap.get(key));
-//        }
 
         //needs to add other error code via checking, if not it will always be 200
         //thinking to remove this and let HttpResponse to handle statusCode instead
         statusCode = "200";
         printStatusCode(statusCode);
+        System.out.println("------- Parsing Request Done -------");
 
         return;
     }
@@ -129,11 +136,15 @@ public class ParseHttpRequest {
         return this.contentType;
     }
 
-    public String getContentLength() {
+    public int getContentLength() {
         return this.contentLength;
     }
 
     public String getResponseBody() {
         return this.responseBody;
+    }
+
+    public boolean getHasBody() {
+        return this.hasBody;
     }
 }
