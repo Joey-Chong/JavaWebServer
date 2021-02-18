@@ -2,3 +2,4 @@
 *.iml
 *.class
 .DS_Store
+log.txt
