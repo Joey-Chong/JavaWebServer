@@ -24,7 +24,7 @@ public class Logger {
     FileWriter writer;
     BufferedWriter bw;
     PrintWriter out;
-    //127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326
+
     public Logger(ParseHttpRequest requestParser) {
         remoteAddress = requestParser.getRemoteAddress();
         //user name
@@ -33,9 +33,11 @@ public class Logger {
         methodLine = requestParser.getMethodLine();
         statusCode = requestParser.getStatusCode();
         //get response body length
-//        path = ConfSettings.getValue("LogFile");
+
         path = new ArrayList<>();
-        path.add("C:\\Users\\joey_\\IdeaProjects\\web-server-joey-adam-team\\");
+//        placeholder path
+//        path.add("C:\\Users\\joey_\\IdeaProjects\\web-server-joey-adam-team\\");
+        path = ConfSettings.getValue("LogFile");    //real path
         String fileName = path.get(0) + "log.txt";
 
         file = new File(fileName);
@@ -61,7 +63,6 @@ public class Logger {
         writer = new FileWriter(file, true);
         bw = new BufferedWriter(writer);
         out = new PrintWriter(bw);
-//        out = new PrintWriter(new FileOutputStream(file, true));
 
         String logLine = String.format("%s %s \"%s\" %s", remoteAddress.toString(),dateString.toString(),
                 methodLine, statusCode);
