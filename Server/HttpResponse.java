@@ -40,7 +40,6 @@ public class HttpResponse {
             out.print(requestParser.getResponseBody() + "\r\n");
         }
         out.flush();
-        Logger logger = new Logger(requestParser);
     }
 
     private void printDate() {
