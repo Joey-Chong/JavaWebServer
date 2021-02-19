@@ -21,6 +21,7 @@ public class ParseHttpRequest {
 
     public ParseHttpRequest(Socket client) throws IOException {
         reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+        headerMap = new HashMap<String, String>();
     }
 
     public void handleRequest() throws IOException {
@@ -31,7 +32,7 @@ public class ParseHttpRequest {
         System.out.println(">" + line);
         String[] methodLine = line.split(" ");
 
-        if(methodLine.length != 3 && !methodLine[0].matches("GET|HEAD|POST|PUT|DELETE")) {
+        if(methodLine.length != 3 || !methodLine[0].matches("GET|HEAD|POST|PUT|DELETE")) {
             statusCode = "400";
             printStatusCode(statusCode);
             return;
@@ -48,7 +49,6 @@ public class ParseHttpRequest {
         }
 
         String[] headerLine;
-        headerMap = new HashMap<String, String>();
         System.out.println("------- Rest of Headers -------");
         while((line = reader.readLine()).length() != 0) {
             System.out.println(">" + line);
@@ -105,7 +105,7 @@ public class ParseHttpRequest {
 
     //left as public just in case needed in response
     public void printStatusCode(String statusCode) {
-        System.out.println(statusCode + " " + ResponseDictionary.getPhrase(statusCode));
+        System.out.println(">" + statusCode + " " + ResponseDictionary.getPhrase(statusCode));
     }
 
     public String getMethod() {

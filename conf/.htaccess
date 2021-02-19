@@ -1,0 +1,23 @@
+# Contains the info related to authoraization
+
+# Absolute path to the location of the file containing the 
+# username and password pairs, in .htpassword format
+
+AuthUserFile "/Users/adam/Documents/Github/web/web-server-joey-adam-team/secret/.htpasswd"
+
+# AuthUserFile "/Users/adam/Documents/Github/web/web-server-joey-adam-team/secret/.htpasswd"
+
+# The only value you will be required to support is ‘Basic’
+
+AuthType Basic
+
+# The name that will be displayed in the authentication window 
+# provided by clients
+
+AuthName "Restricted File Access"
+
+# Specifies the user or group that can access a resource. 
+# valid-user is a special value that indicates that any user 
+# listed in the AuthUserFile can access the resource
+
+Require valid-user

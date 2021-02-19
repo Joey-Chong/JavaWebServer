@@ -23,7 +23,6 @@ public class ConfSettings {
                 assignTokens(line);
             }
         }
-        //System.out.println(configurationsDictionary);
     }
 
     private static void assignTokens(String line) {

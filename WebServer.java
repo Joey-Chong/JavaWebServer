@@ -11,6 +11,7 @@ public class WebServer {
     try {
         ConfSettings.init();
         MimeSettings.init();
+        Athenticator.init();
         ResponseDictionary.init();
         ServerInit server = new ServerInit();
         try {
