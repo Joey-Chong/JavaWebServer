@@ -3,10 +3,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.HashMap;
 import Dictionaries.ResponseDictionary;
 
 public class ParseHttpRequest {
+    private String remoteAddress;
     private String method;
     private String identifier;
     private String version;
@@ -20,6 +22,7 @@ public class ParseHttpRequest {
     private boolean hasBody;
 
     public ParseHttpRequest(Socket client) throws IOException {
+        this.remoteAddress = client.getRemoteSocketAddress().toString();
         reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
         headerMap = new HashMap<String, String>();
     }
@@ -108,6 +111,10 @@ public class ParseHttpRequest {
         System.out.println(">" + statusCode + " " + ResponseDictionary.getPhrase(statusCode));
     }
 
+    public String getMethodLine() {
+        return this.method + " " + this.identifier + " " + this.version;
+    }
+
     public String getMethod() {
         return this.method;
     }
@@ -146,5 +153,9 @@ public class ParseHttpRequest {
 
     public boolean getHasBody() {
         return this.hasBody;
+    }
+
+    public String getRemoteAddress() {
+        return this.remoteAddress;
     }
 }
