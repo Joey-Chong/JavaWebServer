@@ -1,4 +1,4 @@
-package Dictionaries;
+package Server;
 
 import java.util.HashMap;
 import java.util.Base64;

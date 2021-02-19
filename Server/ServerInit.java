@@ -21,8 +21,8 @@ public class ServerInit {
         try {
             int intPort = Integer.parseInt(port);
             socket = new ServerSocket(intPort);
-        } catch (NumberFormatException exception) {  
-            int defaultPort = Integer.parseInt(ConfSettings.getValue("Listen").get(0));
+        } catch (NumberFormatException exception) {
+            int defaultPort = Integer.parseInt(ConfSettings.getCoonfiguration("Listen").get(0));
             socket = new ServerSocket(defaultPort);
         }
         Socket client = null;

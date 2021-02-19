@@ -31,14 +31,18 @@ public class MimeSettings {
         while (tokenizer.hasMoreTokens()) {
             listOfTokens.add(tokenizer.nextToken());
         }
-        String type = listOfTokens.remove(0); 
+        String type = listOfTokens.remove(0);
         for (String extension : listOfTokens) {
             typesDictionary.put(extension, type);
         }
     }
 
     public static String getType(String extension) {
-        return typesDictionary.get(extension);
+        String type = typesDictionary.get(extension);
+        if (type == NULL) {
+            type = "text/text";
+        }
+        return type;
     }
 
 }
