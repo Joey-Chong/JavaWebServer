@@ -38,11 +38,7 @@ public class MimeSettings {
     }
 
     public static String getType(String extension) {
-        String type = typesDictionary.get(extension);
-        if (type == NULL) {
-            type = "text/text";
-        }
-        return type;
+        return typesDictionary.get(extension);
     }
 
 }
