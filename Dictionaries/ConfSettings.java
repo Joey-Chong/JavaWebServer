@@ -13,7 +13,9 @@ public class ConfSettings {
 
     private static StringTokenizer tokenizer;
 
-    private static HashMap<String, ArrayList<String>> configurationsDictionary = new HashMap<String, ArrayList<String>>();
+    private static HashMap<String, String> configurationsDictionary = new HashMap<String, String>();
+    private static HashMap<String, String> aliasDictionary = new HashMap<String, String>();
+    private static HashMap<String, String> scriptAliasDictionary = new HashMap<String, String>();
 
     public static void init () throws IOException{
         BufferedReader reader = new BufferedReader(new FileReader("conf/httpd.conf"));
@@ -32,11 +34,24 @@ public class ConfSettings {
             listOfTokens.add(tokenizer.nextToken());
         }
         String key = listOfTokens.remove(0); 
-        configurationsDictionary.put(key, listOfTokens);
+        if (key == "Alias") {
+            aliasDictionary.put(listOfTokens[0], listOfTokens[1]);
+        } else if (key == "ScriptAlias") {
+            scriptAliasDictionary.put(listOfTokens[0], listOfTokens[1]);
+        }
+        configurationsDictionary.put(key, listOfTokens[0]);
     }
 
-    public static ArrayList<String> getValue(String option) {
+    public static String getConfiguration(String option) {
         return configurationsDictionary.get(option);
+    }
+
+    public static String getAlias(String option) {
+        return aliasDictionary.get(option);
+    }
+
+    public static String getScriptAlias(String option) {
+        return scriptAliasDictionary.get(option);
     }
 
 }
