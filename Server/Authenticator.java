@@ -8,14 +8,16 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.StringTokenizer;
+import java.util.ArrayList;
 import java.nio.Buffer;
 
-public class Athenticator {
+public class Authenticator {
 
-    private HashMap<String, String> passwords = new HashMap<String, String>();
+    private HashMap<String, String> passwordsDictionary = new HashMap<String, String>();
     private HashMap<String, String> authSettings = new HashMap<String, String>();
 
-    public Athenticator(String filePath) throws IOException {
+    public Authenticator(String filePath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
         String line = "";
         while ((line = reader.readLine()) != null) {
@@ -33,18 +35,18 @@ public class Athenticator {
     }
 
     private void assignSettings(String line) {
-        tokenizer = new StringTokenizer(line);
+        StringTokenizer tokenizer = new StringTokenizer(line);
         ArrayList<String> listOfTokens = new ArrayList<String>();
         while (tokenizer.hasMoreTokens()) {
             listOfTokens.add(tokenizer.nextToken());
         }
-        configurationsDictionary.put(listOfTokens[0], listOfTokens[1]);
+        authSettings.put(listOfTokens.get(0), listOfTokens.get(1));
     }
 
     private void assignTokens(String line) {
         String[] tokens = line.split(":");
         if(tokens.length == 2) {
-            passwords.put(tokens[0], tokens[1].replace("{SHA}","").trim());
+            passwordsDictionary.put(tokens[0], tokens[1].replace("{SHA}","").trim());
         }
     }
 
@@ -58,15 +60,15 @@ public class Athenticator {
     }
 
     private boolean verifyPassword(String username, String password) {
-        String assignedPassword = passwords.get(username);
-        if (assignedPassword == NULL) {
-            return False;
+        String assignedPassword = passwordsDictionary.get(username);
+        if (assignedPassword == null) {
+            return false;
         }
         String passwordGiven = encryptClearPassword(password);
         if (passwordGiven == assignedPassword) {
-            return True;
+            return true;
         } 
-        return False;
+        return false;
     }
 
     private String encryptClearPassword(String password) {

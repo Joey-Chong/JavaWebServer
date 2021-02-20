@@ -35,11 +35,14 @@ public class ConfSettings {
         }
         String key = listOfTokens.remove(0);
         if (key == "Alias") {
-            aliasDictionary.put(listOfTokens[0], listOfTokens[1]);
+            aliasDictionary.put(listOfTokens.get(0), listOfTokens.get(1));
         } else if (key == "ScriptAlias") {
-            scriptAliasDictionary.put(listOfTokens[0], listOfTokens[1]);
+            scriptAliasDictionary.put(listOfTokens.get(0), listOfTokens.get(1));
+        } else if (listOfTokens.size() == 0) {
+            configurationsDictionary.put(key, null);
+        } else {
+            configurationsDictionary.put(key, listOfTokens.get(0));
         }
-        configurationsDictionary.put(key, listOfTokens[0]);
     }
 
     public static String getConfiguration(String option) {
@@ -52,6 +55,14 @@ public class ConfSettings {
 
     public static String getScriptAlias(String option) {
         return scriptAliasDictionary.get(option);
+    }
+
+    public static String getDirectoryIndex() {
+        String index = configurationsDictionary.get("DirectoryIndex");
+        if (index == null) {
+            index = "index.html";
+        }
+        return index;
     }
 
 }

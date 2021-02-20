@@ -39,7 +39,7 @@ public class MimeSettings {
 
     public static String getType(String extension) {
         String type = typesDictionary.get(extension);
-        if (type == NULL) {
+        if (type == null) {
             type = "text/text";
         }
         return type;

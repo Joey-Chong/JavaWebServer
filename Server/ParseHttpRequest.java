@@ -25,8 +25,32 @@ public class ParseHttpRequest {
     }
 
     public void handleRequest() throws IOException {
-        String line;
 
+        if (!handleMethodLine()) {
+            return;
+        }
+        if (!handleHeaders()) {
+            return;
+        }
+        if (!handleBody()) {
+            return;
+        }
+
+        String serverPath = FilePathing.handlePathing(identifier);
+        if (!handleAccessFiles(serverPath)) {
+            return;
+        }
+        //needs to add other error code via checking, if not it will always be 200
+        //thinking to remove this and let HttpResponse to handle statusCode instead
+        statusCode = "200";
+        printStatusCode(statusCode);
+        System.out.println("------- Parsing Request Done -------");
+
+        return;
+    }
+
+    public boolean handleMethodLine() throws IOException {
+        String line;
         System.out.println("------- Method -------");
         line = reader.readLine();
         System.out.println(">" + line);
@@ -35,7 +59,7 @@ public class ParseHttpRequest {
         if(methodLine.length != 3 || !methodLine[0].matches("GET|HEAD|POST|PUT|DELETE")) {
             statusCode = "400";
             printStatusCode(statusCode);
-            return;
+            return false;
         }
 
         method = methodLine[0];
@@ -45,9 +69,13 @@ public class ParseHttpRequest {
         if(!version.equals(ResponseDictionary.getSupportedVersion())) {
             statusCode = "400";
             printStatusCode(statusCode);
-            return;
+            return false;
         }
+        return true;
+    }
 
+    public boolean handleHeaders() throws IOException {
+        String line;
         String[] headerLine;
         System.out.println("------- Rest of Headers -------");
         while((line = reader.readLine()).length() != 0) {
@@ -63,7 +91,10 @@ public class ParseHttpRequest {
             headerLine = line.split(": ");
             headerMap.put(headerLine[0], headerLine[1]);
         }
+        return true;
+    }
 
+    public boolean handleBody() throws IOException {
         if(headerMap.containsKey("Content-Type") && headerMap.containsKey("Content-Length")) {
             String bodyReader;
             contentType = headerMap.get("Content-Type");
@@ -85,7 +116,7 @@ public class ParseHttpRequest {
             if(body.length() != contentLength) {
                 System.out.println("------- Body length does not match Content-Length -------");
                 statusCode = "400";
-                return;
+                return false;
             }
             System.out.println(body);
         }
@@ -93,19 +124,34 @@ public class ParseHttpRequest {
             hasBody = false;
             System.out.println("------- No Body Present -------");
         }
-
-        //needs to add other error code via checking, if not it will always be 200
-        //thinking to remove this and let HttpResponse to handle statusCode instead
-        statusCode = "200";
-        printStatusCode(statusCode);
-        System.out.println("------- Parsing Request Done -------");
-
-        return;
+        return true;
     }
 
     //left as public just in case needed in response
     public void printStatusCode(String statusCode) {
         System.out.println(">" + statusCode + " " + ResponseDictionary.getPhrase(statusCode));
+    }
+
+    public boolean handleAuthorization(String accessFilePath) throws IOException {
+        if (headerMap.get("Authorization") == null) {
+            statusCode = "401";
+            return false;
+        }
+        Authenticator auth = new Authenticator(accessFilePath);
+        if (!auth.checkAuthorization(headerMap.get("Authorization"))) {
+            statusCode = "403";
+            return false;
+        }
+        return true;
+    }
+    public boolean handleAccessFiles(String absolutePath) throws IOException {
+        String previousAccessFilePath = "";
+        while ((previousAccessFilePath = FilePathing.checkAuthRequired(absolutePath, previousAccessFilePath)) != null) {
+            if (!handleAuthorization(previousAccessFilePath)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public String getMethod() {
