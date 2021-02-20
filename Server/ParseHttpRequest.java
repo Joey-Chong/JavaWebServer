@@ -26,6 +26,8 @@ public class ParseHttpRequest {
 
     public void handleRequest() throws IOException {
 
+        statusCode = "200";
+
         if (!handleMethodLine()) {
             return;
         }
@@ -42,7 +44,6 @@ public class ParseHttpRequest {
         }
         //needs to add other error code via checking, if not it will always be 200
         //thinking to remove this and let HttpResponse to handle statusCode instead
-        statusCode = "200";
         printStatusCode(statusCode);
         System.out.println("------- Parsing Request Done -------");
 
@@ -51,7 +52,7 @@ public class ParseHttpRequest {
 
     public boolean handleMethodLine() throws IOException {
         String line;
-        System.out.println("------- Method -------");
+        System.out.println("------- Method Headers -------");
         line = reader.readLine();
         System.out.println(">" + line);
         String[] methodLine = line.split(" ");
@@ -145,11 +146,12 @@ public class ParseHttpRequest {
         return true;
     }
     public boolean handleAccessFiles(String absolutePath) throws IOException {
-        String previousAccessFilePath = "";
-        while ((previousAccessFilePath = FilePathing.checkAuthRequired(absolutePath, previousAccessFilePath)) != null) {
+        String previousAccessFilePath = FilePathing.checkAuthRequired(absolutePath, "");
+        while (previousAccessFilePath != null) {
             if (!handleAuthorization(previousAccessFilePath)) {
                 return false;
             }
+            previousAccessFilePath = FilePathing.checkAuthRequired(absolutePath, previousAccessFilePath);
         }
         return true;
     }

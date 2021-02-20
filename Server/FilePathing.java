@@ -12,14 +12,14 @@ public class FilePathing {
         String[] tokens = path.split("/");
         String accessFile = ConfSettings.getConfiguration("AccessFile");
         String accessPath = "/" + accessFile;
-        if (previousCounter != 0 && checkFileExists(accessPath)) {
+        if (previousCounter < 0 && checkFileExists(accessPath)) {
             return accessPath;
         }
         String continuedPath = "";
-        for (int i = 1; i < tokens.length - 1; i += 1) {
+        for (int i = 1; i < tokens.length; i += 1) {
             continuedPath += "/" + tokens[i];
             accessPath = continuedPath + "/" + accessFile;
-            if (previousCounter > i && checkFileExists(accessPath)) {
+            if (previousCounter < i && checkFileExists(accessPath)) {
                 return accessPath;
             }
         }

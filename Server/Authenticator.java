@@ -34,11 +34,20 @@ public class Authenticator {
         }
     }
 
+    private static String removeQuotation(String token) {
+        if (token.startsWith("\"") && token.endsWith("\"")) {
+            return token.substring(1, token.length() - 1);
+        }
+        return token;
+    }
+
     private void assignSettings(String line) {
         StringTokenizer tokenizer = new StringTokenizer(line);
         ArrayList<String> listOfTokens = new ArrayList<String>();
+        String filteredToken;
         while (tokenizer.hasMoreTokens()) {
-            listOfTokens.add(tokenizer.nextToken());
+            filteredToken = removeQuotation(tokenizer.nextToken());
+            listOfTokens.add(filteredToken);
         }
         authSettings.put(listOfTokens.get(0), listOfTokens.get(1));
     }
@@ -65,10 +74,10 @@ public class Authenticator {
             return false;
         }
         String passwordGiven = encryptClearPassword(password);
-        if (passwordGiven == assignedPassword) {
-            return true;
+        if (!passwordGiven.equals(assignedPassword)) {
+            return false;
         } 
-        return false;
+        return true;
     }
 
     private String encryptClearPassword(String password) {

@@ -24,7 +24,9 @@ public class HttpResponse {
 
         String code = requestParser.getStatusCode();
         out.print(ResponseDictionary.getSupportedVersion() + " " + code + " " + ResponseDictionary.getPhrase(code) + "\r\n");
-        out.print("WWW-Authenticate: Basic\r\n");
+        if (code == "401" || code == "403") {
+            out.print("WWW-Authenticate: Basic\r\n");
+        }
         printDate();
         out.print(ResponseDictionary.getServerMessage() + "\r\n");
         if (requestParser.getMethod().equals("HEAD")) {

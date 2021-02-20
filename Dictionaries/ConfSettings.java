@@ -28,10 +28,12 @@ public class ConfSettings {
     }
 
     private static void assignTokens(String line) {
+        String filteredToken;
         tokenizer = new StringTokenizer(line);
         ArrayList<String> listOfTokens = new ArrayList<String>();
         while (tokenizer.hasMoreTokens()) {
-            listOfTokens.add(tokenizer.nextToken());
+            filteredToken = removeQuotation(tokenizer.nextToken());
+            listOfTokens.add(filteredToken);
         }
         String key = listOfTokens.remove(0);
         if (key == "Alias") {
@@ -43,6 +45,13 @@ public class ConfSettings {
         } else {
             configurationsDictionary.put(key, listOfTokens.get(0));
         }
+    }
+
+    private static String removeQuotation(String token) {
+        if (token.startsWith("\"") && token.endsWith("\"")) {
+            return token.substring(1, token.length() - 1);
+        }
+        return token;
     }
 
     public static String getConfiguration(String option) {
