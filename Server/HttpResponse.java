@@ -9,7 +9,6 @@ import Server.HttpMethods.MethodTable;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 
 public class HttpResponse {
 
