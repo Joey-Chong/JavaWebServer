@@ -19,7 +19,7 @@ public class Logger {
     private String responseBodyLength;
     private ParseHttpRequest requestParser;
 
-    private ArrayList<String> path;
+    private String path;
     File file;
     FileWriter writer;
     BufferedWriter bw;
@@ -34,11 +34,11 @@ public class Logger {
         statusCode = requestParser.getStatusCode();
         //get response body length
 
-        path = new ArrayList<>();
+        path = "";
 //        placeholder path
-//        path.add("C:\\Users\\joey_\\IdeaProjects\\web-server-joey-adam-team\\");
-        path = ConfSettings.getValue("LogFile");    //real path
-        String fileName = path.get(0) + "log.txt";
+//        path = "C:\\Users\\joey_\\IdeaProjects\\web-server-joey-adam-team\\";
+        path = ConfSettings.getConfiguration("LogFile");    //real path
+        String fileName = path + "log.txt";
 
         file = new File(fileName);
         if(file.exists()) {
