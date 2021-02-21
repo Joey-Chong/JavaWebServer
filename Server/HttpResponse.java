@@ -1,11 +1,12 @@
 package Server;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.HashMap;
+
 import Dictionaries.ResponseDictionary;
+import Server.HttpMethods.HttpMethod;
+import Server.HttpMethods.MethodTable;
+
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
@@ -13,10 +14,15 @@ public class HttpResponse {
 
     private PrintWriter out;
     private ParseHttpRequest requestParser;
+    private String requestMethod;
+    private String requestMethodClass;
 
     public HttpResponse(Socket socket, ParseHttpRequest requestParser) throws IOException {
         out = new PrintWriter(socket.getOutputStream(), true);
         this.requestParser = requestParser;
+        requestMethod = requestParser.getMethod();
+        MethodTable.init();
+        requestMethodClass = MethodTable.get(requestMethod);
     }
 
     public void respond() throws IOException {
@@ -27,6 +33,16 @@ public class HttpResponse {
         out.print("WWW-Authenticate: Basic\r\n");
         printDate();
         out.print(ResponseDictionary.getServerMessage() + "\r\n");
+
+        System.out.println("------------- Creating method instances -------------");
+        try {
+            HttpMethod httpMethod = (HttpMethod) (Class.forName("Server.HttpMethods." + requestMethodClass).newInstance());
+            httpMethod.execute();
+            code = httpMethod.getStatusCode();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
         if (requestParser.getMethod().equals("HEAD")) {
             out.print("Last-Modified: " + ResponseDictionary.getDateModified() + "\r\n");
         }
