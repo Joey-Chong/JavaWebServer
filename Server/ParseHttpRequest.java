@@ -93,7 +93,14 @@ public class ParseHttpRequest {
             }
 
             headerLine = line.split(": ");
-            headerMap.put(headerLine[0], headerLine[1]);
+            if (headerLine[0].equals("Authorization")) {
+                String[] authComponents = headerLine[1].split(" ");
+                headerMap.put(headerLine[0], authComponents[1]);
+                System.out.println(">" + headerMap.get("Authorization"));
+            } else {
+                headerMap.put(headerLine[0], headerLine[1]);
+            }
+
         }
         return true;
     }

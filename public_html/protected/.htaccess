@@ -1,11 +1,11 @@
+
 # Contains the info related to authoraization
 
 # Absolute path to the location of the file containing the 
 # username and password pairs, in .htpassword format
 
-AuthUserFile "/Users/adam/Documents/Github/web-server-joey-adam-team/secret/.htpasswd"
-
-# AuthUserFile "/Users/adam/Documents/Github/web-server-joey-adam-team/secret/.htpasswd"
+AuthUserFile "/Users/adam/Documents/Github/web-server-joey-adam-team/public_html/.htpasswd"
+# AuthUserFile "/Users/adam/Documents/Github/web-server-joey-adam-team/public_html/.htpasswd"
 
 # The only value you will be required to support is ‘Basic’
 
