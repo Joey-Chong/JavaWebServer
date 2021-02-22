@@ -48,19 +48,26 @@ public class HttpResponse {
         }
         out.print("Content-Type: " + contentType + "\r\n");
         out.print("Content-Length: " + contentLength + "\r\n");
+        System.out.println("Content details");
+        System.out.println(contentType);
+        System.out.println(contentLength);
         out.print("Connection: Closed\r\n");
 
         out.print("\r\n");
 
+        //very important
+        out.flush();
+
         if (responseBody != null) {
             out.print(responseBody + "\r\n");
         }
+        responseBody = null;
 
         if (outputStream != null) {
             outputStream.write(responseByte);
             out.print("\r\n");
         }
-        outputStream = null;
+        outputStream.flush();
 
         /**if (filePath != null) {
             File outFile = new File(filePath);
