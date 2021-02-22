@@ -1,5 +1,6 @@
 package Server;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -13,6 +14,7 @@ public class HttpResponse {
 
     private PrintWriter out;
     private ParseHttpRequest requestParser;
+    OutputStream outputStream;
 
 
     private String statusCode;
@@ -20,9 +22,11 @@ public class HttpResponse {
     private String contentType;
     private String contentLength;
     private String responseBody;
+    private byte[] responseByte = "".getBytes();
     private String filePath;
 
     public HttpResponse(Socket socket) throws IOException {
+        outputStream = socket.getOutputStream();
         out = new PrintWriter(socket.getOutputStream(), true);
         statusCode = "200";
     }
@@ -52,6 +56,12 @@ public class HttpResponse {
             out.print(responseBody + "\r\n");
         }
 
+        if (outputStream != null) {
+            outputStream.write(responseByte);
+            out.print("\r\n");
+        }
+        outputStream = null;
+
         /**if (filePath != null) {
             File outFile = new File(filePath);
             out.print(filePath + "\r\n");
@@ -78,12 +88,24 @@ public class HttpResponse {
         contentType = type;
     }
 
+    public String getContentType() {
+        return this.contentType;
+    }
+
     public void setContentLength(String length) {
         contentLength = length;
     }
 
     public void setResponseBody(String body) {
         responseBody = body;
+    }
+
+    public void setResponseByte(byte[] body) {
+        responseByte = body;
+    }
+
+    public OutputStream getOutputStream() {
+        return this.outputStream;
     }
 
     public void setFilePath(String path) {
