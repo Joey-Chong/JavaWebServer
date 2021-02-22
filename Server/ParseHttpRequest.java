@@ -187,8 +187,8 @@ public class ParseHttpRequest {
         File pathFile = new File(path);
         String fileName = pathFile.getName();
         if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
-            String extention = fileName.substring(fileName.lastIndexOf(".")+1);
-            String fileType = MimeSettings.getType(extention);
+            String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+            String fileType = MimeSettings.getType(extension);
             responder.setContentType(fileType);
         }
     }
