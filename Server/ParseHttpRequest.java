@@ -49,7 +49,7 @@ public class ParseHttpRequest {
         if (!handleAccessFiles(serverPath)) {
             return;
         }
-
+        
         if (!FilePathing.checkFileExists(serverPath)) {
             responder.setStatusCode("404");
             return;
@@ -64,7 +64,8 @@ public class ParseHttpRequest {
             }
         } else {
             responder.setIsScript();
-            if (!CGIScript.executeScript(serverPath, this)) {
+            String queryString = FilePathing.getQueryString(identifier);
+            if (!CGIScript.executeScript(serverPath, queryString, this)) {
                 return;
             }
         }

@@ -42,6 +42,16 @@ public class FilePathing {
         return false;
     }
 
+    public static String getQueryString(String requestPath) {
+        String queryString = "";
+        String[] tokens = requestPath.split("/");
+        int queryStart = tokens[tokens.length-1].indexOf("?") + 1;
+        if (queryStart != 0) {
+            queryString = tokens[tokens.length-1].substring(queryStart, tokens[tokens.length-1].length());
+        }
+        return queryString;
+    }
+
     public static String handlePathing(String requestPath) {
         if (requestPath.contains("://")) {
             String filteredPath = createFilteredPath(requestPath, 3);
@@ -109,8 +119,15 @@ public class FilePathing {
     }
 
     private static String handleIsFile(String filePath) {
-        File file = new File(filePath);
-        String completePath = filePath;
+        String filteredPath = filePath;
+        String[] tokens = filePath.split("/");
+        int queryStart = tokens[tokens.length-1].indexOf("?");
+        if (queryStart != -1) {
+            int queryLength = tokens[tokens.length-1].length() - queryStart;
+            filteredPath = filePath.substring(0, filePath.length()-queryLength);
+        }
+        File file = new File(filteredPath);
+        String completePath = filteredPath;
         if (file.isDirectory()) {
             completePath += "/" + ConfSettings.getDirectoryIndex();
         }

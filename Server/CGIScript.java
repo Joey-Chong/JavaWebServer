@@ -18,11 +18,11 @@ import java.io.InputStreamReader;
 
 public class CGIScript {
 
-    public static boolean executeScript(String scriptPath, ParseHttpRequest parser) {
+    public static boolean executeScript(String scriptPath, String queryString, ParseHttpRequest parser) {
         try {
             ProcessBuilder operatingBuilder = new ProcessBuilder(scriptPath);
             Map<String, String> environmentMap = operatingBuilder.environment();
-            if (!assignEnvironmentVariables(environmentMap, parser.getHeaderMap())) {
+            if (!assignEnvironmentVariables(environmentMap, queryString, parser.getHeaderMap())) {
                 parser.getResponder().setStatusCode("500");
                 return false;
             }
@@ -55,15 +55,15 @@ public class CGIScript {
         return true;
     }
 
-    private static boolean assignEnvironmentVariables(Map<String, String> environmentMap, HashMap<String, String> headerMap) {
+    private static boolean assignEnvironmentVariables(Map<String, String> environmentMap, String queryString, HashMap<String, String> headerMap) {
         try {
-            environmentMap.put("QUERY_STRING", "query1=a&query2=b");
+            environmentMap.put("QUERY_STRING", queryString);
             environmentMap.put("SERVER_PROTOCOL", ResponseDictionary.getSupportedVersion());
             Iterator headerIterator = headerMap.entrySet().iterator(); 
             while (headerIterator.hasNext()) { 
                 Map.Entry mapElement = (Map.Entry)headerIterator.next(); 
                 String key = "HTTP_" + ((String)mapElement.getKey()).toUpperCase();
-                environmentMap.put(key, (String)mapElement.getKey());
+                environmentMap.put(key, (String)mapElement.getValue());
             } 
         } catch (Exception e) {
             return false;
