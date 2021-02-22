@@ -19,21 +19,19 @@ public class GetMethod extends HttpMethod{
 
         file = new File(filePath);
         response.setContentLength(String.valueOf(file.length()));
-//        response.setContentLength("3077");
         System.out.println(file.length());
         System.out.println(filePath);
 
         String contentType = response.getContentType();
-//        if(contentType.contains("image")) {
-            System.out.println("content type: " + contentType);
-            try {
-                byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
-                response.setResponseByte(fileBytes);
-                System.out.println("file bytes here: " + fileBytes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-//        }
+        System.out.println("content type: " + contentType);
+        try {
+            byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
+            response.setResponseByte(fileBytes);
+            System.out.println("file bytes here: " + fileBytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 //        else {
 //            try {
 //                String body = "";
