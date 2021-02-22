@@ -74,10 +74,32 @@ public class FilePathing {
     }
 
     private static String handleIsAlias(String requestPath) {
+        String aliasPath = "";
+        String[] tokens = requestPath.split("/");
+        for (int i = 1; i < tokens.length; i += 1) {
+            String tokenPath = "/" + tokens[i] + "/";
+            if ((aliasPath = ConfSettings.getScriptAlias(tokenPath)) != null) {
+                for (int j = i + 1; j < tokens.length; j += 1) {
+                    aliasPath += "/" + tokens[j];
+                    return aliasPath;
+                }
+            }
+        }
         return ConfSettings.getAlias(requestPath);
     }
 
     private static String handleIsScriptAlias(String requestPath) {
+        String scriptPath = "";
+        String[] tokens = requestPath.split("/");
+        for (int i = 1; i < tokens.length; i += 1) {
+            String tokenPath = "/" + tokens[i] + "/";
+            if ((scriptPath = ConfSettings.getScriptAlias(tokenPath)) != null) {
+                for (int j = i + 1; j < tokens.length; j += 1) {
+                    scriptPath += "/" + tokens[j];
+                    return scriptPath;
+                }
+            }
+        }
         return ConfSettings.getScriptAlias(requestPath);
     }
 

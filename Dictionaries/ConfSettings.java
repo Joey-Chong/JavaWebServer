@@ -36,9 +36,9 @@ public class ConfSettings {
             listOfTokens.add(filteredToken);
         }
         String key = listOfTokens.remove(0);
-        if (key == "Alias") {
+        if (key.equals("Alias")) {
             aliasDictionary.put(listOfTokens.get(0), listOfTokens.get(1));
-        } else if (key == "ScriptAlias") {
+        } else if (key.equals("ScriptAlias")) {
             scriptAliasDictionary.put(listOfTokens.get(0), listOfTokens.get(1));
         } else if (listOfTokens.size() == 0) {
             configurationsDictionary.put(key, null);
