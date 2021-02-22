@@ -31,6 +31,17 @@ public class FilePathing {
         return file.exists();
     }
 
+    public static boolean checkFileScriptAliased(String requestPath) {
+        String filteredPath = requestPath;
+        if (requestPath.contains("://")) {
+            filteredPath = createFilteredPath(requestPath, 3);
+        } 
+        if (handleIsScriptAlias(filteredPath) != null) {
+            return true;
+        }
+        return false;
+    }
+
     public static String handlePathing(String requestPath) {
         if (requestPath.contains("://")) {
             String filteredPath = createFilteredPath(requestPath, 3);

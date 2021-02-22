@@ -59,8 +59,12 @@ public class ParseHttpRequest {
 
         responder.setFilePath(serverPath);
 
-        if (!prepareResponse(serverPath)) {
-            return;
+        if (!FilePathing.checkFileScriptAliased(identifier)) {
+            if (!prepareResponse(serverPath)) {
+                return;
+            }
+        } else {
+            System.out.println(">Script");
         }
         //needs to add other error code via checking, if not it will always be 200
         //thinking to remove this and let HttpResponse to handle statusCode instead
