@@ -19,22 +19,12 @@ public class GetMethod extends HttpMethod{
 
         file = new File(filePath);
         response.setContentLength(String.valueOf(file.length()));
+//        response.setContentLength("3077");
+        System.out.println(file.length());
+        System.out.println(filePath);
 
         String contentType = response.getContentType();
-        if(contentType.equals("text/html")) {
-            try {
-                String body = "";
-                BufferedReader reader = new BufferedReader(new FileReader(file));
-                String line = "";
-                while ((line = reader.readLine()) != null) {
-                    body += line + "\n";
-                }
-                response.setResponseBody(body);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        else {
+//        if(contentType.contains("image")) {
             System.out.println("content type: " + contentType);
             try {
                 byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
@@ -43,7 +33,20 @@ public class GetMethod extends HttpMethod{
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+//        }
+//        else {
+//            try {
+//                String body = "";
+//                BufferedReader reader = new BufferedReader(new FileReader(file));
+//                String line = "";
+//                while ((line = reader.readLine()) != null) {
+//                    body += line + "\n";
+//                }
+//                response.setResponseBody(body);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     @Override
