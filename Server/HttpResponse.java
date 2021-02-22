@@ -4,8 +4,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import Dictionaries.ResponseDictionary;
-import Server.HttpMethods.HttpMethod;
-import Server.HttpMethods.MethodTable;
+import Dictionaries.MethodTable;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -14,57 +13,81 @@ public class HttpResponse {
 
     private PrintWriter out;
     private ParseHttpRequest requestParser;
-    private String requestMethod;
-    private String requestMethodClass;
 
-    public HttpResponse(Socket socket, ParseHttpRequest requestParser) throws IOException {
+
+    private String statusCode;
+    private String requestMethod;
+    private String contentType;
+    private String contentLength;
+    private String responseBody;
+    private String filePath;
+
+    public HttpResponse(Socket socket) throws IOException {
         out = new PrintWriter(socket.getOutputStream(), true);
-        this.requestParser = requestParser;
-        requestMethod = requestParser.getMethod();
-        MethodTable.init();
-        requestMethodClass = MethodTable.get(requestMethod);
+        statusCode = "200";
     }
 
     public void respond() throws IOException {
         out.print("\r\n");
 
-        String code = requestParser.getStatusCode();
-        out.print(ResponseDictionary.getSupportedVersion() + " " + code + " " + ResponseDictionary.getPhrase(code) + "\r\n");
-        if (code == "401" || code == "403") {
+        out.print(ResponseDictionary.getSupportedVersion() + " " + statusCode + " " + ResponseDictionary.getPhrase(statusCode) + "\r\n");
+
+        if (statusCode == "401" || statusCode == "403") {
             out.print("WWW-Authenticate: Basic\r\n");
         }
+
         printDate();
         out.print(ResponseDictionary.getServerMessage() + "\r\n");
 
-        System.out.println("------------- Creating method instances -------------");
-        try {
-            HttpMethod httpMethod = (HttpMethod) (Class.forName("Server.HttpMethods." + requestMethodClass).newInstance());
-            httpMethod.execute();
-            code = httpMethod.getStatusCode();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        if (requestParser.getMethod().equals("HEAD")) {
+        if (requestMethod.equals("HEAD")) {
             out.print("Last-Modified: " + ResponseDictionary.getDateModified() + "\r\n");
         }
-        out.print("Content-Type: " + requestParser.getContentType() + "\r\n");
-        out.print("Content-Length: " + requestParser.getContentLength() + "\r\n");
+        out.print("Content-Type: " + contentType + "\r\n");
+        out.print("Content-Length: " + contentLength + "\r\n");
         out.print("Connection: Closed\r\n");
 
         out.print("\r\n");
 
-        if (requestParser.getResponseBody() != null) {
-            out.print(requestParser.getResponseBody() + "\r\n");
+        if (responseBody != null) {
+            out.print(responseBody + "\r\n");
         }
+
+        /**if (filePath != null) {
+            File outFile = new File(filePath);
+            out.print(filePath + "\r\n");
+        }**/
         out.flush();
-        Logger logger = new Logger(requestParser);
+        //Logger logger = new Logger(requestParser);
     }
 
     private void printDate() {
         Date currentDate = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("E, yyyy MM dd hh:mm:ss zzz");
-        out.print("Date: "+dateFormat.format(currentDate)+"\r\n");
+        out.print("Date: " + dateFormat.format(currentDate) + "\r\n");
+    }
+
+    public void setStatusCode(String newCode) {
+        statusCode = newCode;
+    }
+
+    public void setRequestMethod(String method) {
+        requestMethod = method;
+    }
+
+    public void setContentType(String type) {
+        contentType = type;
+    }
+
+    public void setContentLength(String length) {
+        contentLength = length;
+    }
+
+    public void setResponseBody(String body) {
+        responseBody = body;
+    }
+
+    public void setFilePath(String path) {
+        filePath = path;
     }
 }
 /**

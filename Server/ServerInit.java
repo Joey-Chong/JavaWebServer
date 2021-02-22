@@ -29,9 +29,9 @@ public class ServerInit {
 
         while(true) {
             client = socket.accept();
-            parser = new ParseHttpRequest(client);
+            responder = new HttpResponse(client);
+            parser = new ParseHttpRequest(client, responder);
             parser.handleRequest();
-            responder = new HttpResponse(client, parser);
             responder.respond();
             client.close();
         }

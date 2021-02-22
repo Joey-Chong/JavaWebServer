@@ -31,7 +31,7 @@ public class Logger {
         date = new SimpleDateFormat("dd/MMM/yyyy:hh:mm:ss Z");
         dateString = date.format(new Date());
         methodLine = requestParser.getMethodLine();
-        statusCode = requestParser.getStatusCode();
+        //statusCode = requestParser.getStatusCode();
         //get response body length
 
         path = "";

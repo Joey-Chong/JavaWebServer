@@ -6,30 +6,34 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.HashMap;
 import Dictionaries.ResponseDictionary;
+import Dictionaries.MimeSettings;
+import Dictionaries.MethodTable;
+import Server.HttpMethods.HttpMethod;
+import java.io.File;
 
 public class ParseHttpRequest {
     private String remoteAddress;
+
     private String method;
     private String identifier;
     private String version;
     private HashMap<String, String> headerMap;
-    private String statusCode;
     private String contentType;
     private int contentLength;
-    private String responseBody;
     private String body;
     private BufferedReader reader;
     private boolean hasBody;
 
-    public ParseHttpRequest(Socket client) throws IOException {
+    private HttpResponse responder;
+
+    public ParseHttpRequest(Socket client, HttpResponse responder) throws IOException {
         this.remoteAddress = client.getRemoteSocketAddress().toString();
+        this.responder = responder;
         reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
         headerMap = new HashMap<String, String>();
     }
 
     public void handleRequest() throws IOException {
-
-        statusCode = "200";
 
         if (!handleMethodLine()) {
             return;
@@ -45,15 +49,27 @@ public class ParseHttpRequest {
         if (!handleAccessFiles(serverPath)) {
             return;
         }
+
+        if (!FilePathing.checkFileExists(serverPath)) {
+            responder.setStatusCode("404");
+            return;
+        }
+
+        assignFileType(serverPath);
+
+        responder.setFilePath(serverPath);
+
+        if (!prepareResponse(serverPath)) {
+            return;
+        }
         //needs to add other error code via checking, if not it will always be 200
         //thinking to remove this and let HttpResponse to handle statusCode instead
-        printStatusCode(statusCode);
         System.out.println("------- Parsing Request Done -------");
 
         return;
     }
 
-    public boolean handleMethodLine() throws IOException {
+    private boolean handleMethodLine() throws IOException {
         String line;
         System.out.println("------- Method Headers -------");
         line = reader.readLine();
@@ -61,24 +77,26 @@ public class ParseHttpRequest {
         String[] methodLine = line.split(" ");
 
         if(methodLine.length != 3 || !methodLine[0].matches("GET|HEAD|POST|PUT|DELETE")) {
-            statusCode = "400";
-            printStatusCode(statusCode);
+            responder.setStatusCode("400");
             return false;
         }
+
+        System.out.println(">" + responder);
+        System.out.println(">" + methodLine[0]);
+        responder.setRequestMethod(methodLine[0]);
 
         method = methodLine[0];
         identifier = methodLine[1];
         version = methodLine[2];
         version.replace("\\r\\n", "");
         if(!version.equals(ResponseDictionary.getSupportedVersion())) {
-            statusCode = "400";
-            printStatusCode(statusCode);
+            responder.setStatusCode("400");
             return false;
         }
         return true;
     }
 
-    public boolean handleHeaders() throws IOException {
+    private boolean handleHeaders() throws IOException {
         String line;
         String[] headerLine;
         System.out.println("------- Rest of Headers -------");
@@ -96,7 +114,6 @@ public class ParseHttpRequest {
             if (headerLine[0].equals("Authorization")) {
                 String[] authComponents = headerLine[1].split(" ");
                 headerMap.put(headerLine[0], authComponents[1]);
-                System.out.println(">" + headerMap.get("Authorization"));
             } else {
                 headerMap.put(headerLine[0], headerLine[1]);
             }
@@ -105,7 +122,7 @@ public class ParseHttpRequest {
         return true;
     }
 
-    public boolean handleBody() throws IOException {
+    private boolean handleBody() throws IOException {
         if(headerMap.containsKey("Content-Type") && headerMap.containsKey("Content-Length")) {
             String bodyReader;
             contentType = headerMap.get("Content-Type");
@@ -120,13 +137,13 @@ public class ParseHttpRequest {
                     break;
                 }
                 else {
-                    body = body + bodyReader + "\n";
+                    body += bodyReader + "\n";
                 }
             }
             System.out.println("------- End of Body -------");
             if(body.length() != contentLength) {
                 System.out.println("------- Body length does not match Content-Length -------");
-                statusCode = "400";
+                responder.setStatusCode("400");
                 return false;
             }
             System.out.println(body);
@@ -138,30 +155,50 @@ public class ParseHttpRequest {
         return true;
     }
 
-    //left as public just in case needed in response
-    public void printStatusCode(String statusCode) {
-        System.out.println(">" + statusCode + " " + ResponseDictionary.getPhrase(statusCode));
-    }
-
-    public boolean handleAuthorization(String accessFilePath) throws IOException {
+    private boolean handleAuthorization(String accessFilePath) throws IOException {
         if (headerMap.get("Authorization") == null) {
-            statusCode = "401";
+            responder.setStatusCode("401");
             return false;
         }
         Authenticator auth = new Authenticator(accessFilePath);
         if (!auth.checkAuthorization(headerMap.get("Authorization"))) {
-            statusCode = "403";
+            responder.setStatusCode("403");
             return false;
         }
         return true;
     }
-    public boolean handleAccessFiles(String absolutePath) throws IOException {
+
+    private boolean handleAccessFiles(String absolutePath) throws IOException {
         String previousAccessFilePath = FilePathing.checkAuthRequired(absolutePath, "");
         while (previousAccessFilePath != null) {
             if (!handleAuthorization(previousAccessFilePath)) {
                 return false;
             }
             previousAccessFilePath = FilePathing.checkAuthRequired(absolutePath, previousAccessFilePath);
+        }
+        return true;
+    }
+
+    private void assignFileType(String path) {
+        File pathFile = new File(path);
+        String fileName = pathFile.getName();
+        if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0) {
+            String extention = fileName.substring(fileName.lastIndexOf(".")+1);
+            String fileType = MimeSettings.getType(extention);
+            responder.setContentType(fileType);
+        }
+    }
+
+    private boolean prepareResponse(String serverPath) {
+        System.out.println("------------- Creating method instances -------------");
+        try {
+            MethodTable.init();
+            String requestMethodClass = MethodTable.get(method);
+            HttpMethod httpMethod = (HttpMethod) (Class.forName("Server.HttpMethods." + requestMethodClass).newInstance());
+            httpMethod.execute(serverPath, responder);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            return false;
         }
         return true;
     }
@@ -190,20 +227,12 @@ public class ParseHttpRequest {
         return this.body;
     }
 
-    public String getStatusCode() {
-        return this.statusCode;
-    }
-
     public String getContentType() {
         return this.contentType;
     }
 
     public int getContentLength() {
         return this.contentLength;
-    }
-
-    public String getResponseBody() {
-        return this.responseBody;
     }
 
     public boolean getHasBody() {

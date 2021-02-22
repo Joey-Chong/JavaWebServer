@@ -1,4 +1,4 @@
-package Server.HttpMethods;
+package Dictionaries;
 
 import java.util.HashMap;
 
