@@ -55,6 +55,7 @@ public class HttpResponse {
         }
 
         out.print("Connection: Closed\r\n");
+        out.print("\r\n");
 
         //very important
         out.flush();
