@@ -22,7 +22,7 @@ public class HttpResponse {
     private String contentType;
     private String contentLength;
     private String responseBody;
-    private byte[] responseByte = "".getBytes();
+    private byte[] responseByte;
     private String filePath;
     private boolean isScript;
 
