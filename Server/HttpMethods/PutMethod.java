@@ -15,6 +15,7 @@ public class PutMethod extends HttpMethod{
     @Override
     public void execute(String filePath, HttpResponse response, ParseHttpRequest request) {
         file = new File(filePath);
+        System.out.println(filePath);
 
         try {
             fw = new FileWriter(file, false);

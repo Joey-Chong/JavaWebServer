@@ -21,8 +21,6 @@ public class PostMethod extends HttpMethod{
             fw = new FileWriter(file, true);
             if (file.exists()) {
                 System.out.println(filePath);
-                System.out.println(MimeSettings.getExtension(request.getContentType()));
-                file.createNewFile();
                 fw.write(request.getBody());
                 System.out.println("POST existed " + request.getBody());
                 statusCode = "200";
