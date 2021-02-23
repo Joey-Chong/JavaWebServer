@@ -3,9 +3,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.io.File;
+import java.io.FileWriter;
 
 import Dictionaries.ResponseDictionary;
 import Dictionaries.MethodTable;
+import Dictionaries.ConfSettings;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -15,7 +18,7 @@ public class HttpResponse {
 
     private PrintWriter out;
     private ParseHttpRequest requestParser;
-    OutputStream outputStream;
+    private OutputStream outputStream;
 
     private String statusCode;
     private String requestMethod;
@@ -24,12 +27,12 @@ public class HttpResponse {
     private String responseBody;
     private byte[] responseByte;
     private String filePath;
+    private String remoteAddress;
     private boolean isScript;
 
     public HttpResponse(Socket socket) throws IOException {
         outputStream = socket.getOutputStream();
         out = new PrintWriter(socket.getOutputStream(), true);
-//        statusCode = "200";
         isScript = false;
     }
 
@@ -42,7 +45,7 @@ public class HttpResponse {
             out.print("WWW-Authenticate: Basic\r\n");
         }
 
-        printDate();
+        out.print("Date: " + printDate() + "\r\n");
         out.print(ResponseDictionary.getServerMessage() + "\r\n");
 
         if (requestMethod.equals("HEAD")) {
@@ -60,24 +63,48 @@ public class HttpResponse {
             out.print("\r\n");
         }
 
-        //very important
         out.flush();
 
-        if (outputStream != null) {
+        if (responseByte != null) {
             outputStream.write(responseByte);
             out.print("\r\n");
         }
         outputStream.flush();
 
         out.flush();
-        //Logger logger = new Logger(requestParser);
+        writeToLog();
     }
 
-    private void printDate() {
+    private String printDate() {
         Date currentDate = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("E, yyyy MM dd hh:mm:ss zzz");
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-        out.print("Date: " + dateFormat.format(currentDate) + "\r\n");
+        return dateFormat.format(currentDate).toString();
+    }
+
+    private void writeToLog() {
+        System.out.println("------- Logging -------");
+        File logFile = new File(ConfSettings.getConfiguration("LogFile"));
+        try {
+            FileWriter logWriter = new FileWriter(logFile, true);
+            String logLine = String.format("%s-%s-\"%s\"-%s", remoteAddress.toString(),printDate(),
+                    requestMethod, statusCode);
+            logWriter.write(logLine);
+            logWriter.flush();
+            System.out.println(logLine);
+            logWriter.close();
+        } catch (IOException exception) {
+            System.out.println(">***** " + exception);
+        }
+        System.out.println("------- Logging Done -------");
+    }
+
+    public void setRemoteAddress(String address) {
+        remoteAddress = address;
+    }
+
+    public String getRemoteAddress() {
+        return remoteAddress;
     }
 
     public void setStatusCode(String newCode) {

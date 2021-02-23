@@ -13,7 +13,6 @@ import java.io.File;
 import java.util.Locale;
 
 public class ParseHttpRequest {
-    private String remoteAddress;
 
     private String method;
     private String identifier;
@@ -31,7 +30,8 @@ public class ParseHttpRequest {
         System.out.println();
         System.out.println("------------------Accepting Client Input------------------------");
         System.out.println();
-        this.remoteAddress = client.getRemoteSocketAddress().toString();
+        String remoteAddress = client.getRemoteSocketAddress().toString();
+        responder.setRemoteAddress(remoteAddress);
         this.responder = responder;
         reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
         headerMap = new HashMap<String, String>();
@@ -254,9 +254,5 @@ public class ParseHttpRequest {
 
     public boolean getHasBody() {
         return this.hasBody;
-    }
-
-    public String getRemoteAddress() {
-        return this.remoteAddress;
     }
 }
