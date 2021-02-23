@@ -24,11 +24,13 @@ public class HttpResponse {
     private String responseBody;
     private byte[] responseByte = "".getBytes();
     private String filePath;
+    private boolean isScript;
 
     public HttpResponse(Socket socket) throws IOException {
         outputStream = socket.getOutputStream();
         out = new PrintWriter(socket.getOutputStream(), true);
         statusCode = "200";
+        isScript = false;
     }
 
     public void respond() throws IOException {
@@ -46,14 +48,13 @@ public class HttpResponse {
         if (requestMethod.equals("HEAD")) {
             out.print("Last-Modified: " + ResponseDictionary.getDateModified() + "\r\n");
         }
-        out.print("Content-Type: " + contentType + "\r\n");
-        out.print("Content-Length: " + contentLength + "\r\n");
-        System.out.println("Content details");
-        System.out.println(contentType);
-        System.out.println(contentLength);
-        out.print("Connection: Closed\r\n");
 
-        out.print("\r\n");
+        if (!isScript) {
+            out.print("Content-Type: " + contentType + "\r\n");
+            out.print("Content-Length: " + contentLength + "\r\n");
+        }
+
+        out.print("Connection: Closed\r\n");
 
         //very important
         out.flush();
@@ -117,6 +118,10 @@ public class HttpResponse {
 
     public void setFilePath(String path) {
         filePath = path;
+    }
+
+    public void setIsScript() {
+        isScript = true;
     }
 }
 /**

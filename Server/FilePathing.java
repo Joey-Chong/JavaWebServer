@@ -42,6 +42,16 @@ public class FilePathing {
         return false;
     }
 
+    public static String getQueryString(String requestPath) {
+        String queryString = "";
+        String[] tokens = requestPath.split("/");
+        int queryStart = tokens[tokens.length-1].indexOf("?") + 1;
+        if (queryStart != 0) {
+            queryString = tokens[tokens.length-1].substring(queryStart, tokens[tokens.length-1].length());
+        }
+        return queryString;
+    }
+
     public static String handlePathing(String requestPath) {
         if (requestPath.contains("://")) {
             String filteredPath = createFilteredPath(requestPath, 3);
@@ -74,10 +84,32 @@ public class FilePathing {
     }
 
     private static String handleIsAlias(String requestPath) {
+        String aliasPath = "";
+        String[] tokens = requestPath.split("/");
+        for (int i = 1; i < tokens.length; i += 1) {
+            String tokenPath = "/" + tokens[i] + "/";
+            if ((aliasPath = ConfSettings.getScriptAlias(tokenPath)) != null) {
+                for (int j = i + 1; j < tokens.length; j += 1) {
+                    aliasPath += "/" + tokens[j];
+                    return aliasPath;
+                }
+            }
+        }
         return ConfSettings.getAlias(requestPath);
     }
 
     private static String handleIsScriptAlias(String requestPath) {
+        String scriptPath = "";
+        String[] tokens = requestPath.split("/");
+        for (int i = 1; i < tokens.length; i += 1) {
+            String tokenPath = "/" + tokens[i] + "/";
+            if ((scriptPath = ConfSettings.getScriptAlias(tokenPath)) != null) {
+                for (int j = i + 1; j < tokens.length; j += 1) {
+                    scriptPath += "/" + tokens[j];
+                    return scriptPath;
+                }
+            }
+        }
         return ConfSettings.getScriptAlias(requestPath);
     }
 
@@ -87,8 +119,15 @@ public class FilePathing {
     }
 
     private static String handleIsFile(String filePath) {
-        File file = new File(filePath);
-        String completePath = filePath;
+        String filteredPath = filePath;
+        String[] tokens = filePath.split("/");
+        int queryStart = tokens[tokens.length-1].indexOf("?");
+        if (queryStart != -1) {
+            int queryLength = tokens[tokens.length-1].length() - queryStart;
+            filteredPath = filePath.substring(0, filePath.length()-queryLength);
+        }
+        File file = new File(filteredPath);
+        String completePath = filteredPath;
         if (file.isDirectory()) {
             completePath += "/" + ConfSettings.getDirectoryIndex();
         }

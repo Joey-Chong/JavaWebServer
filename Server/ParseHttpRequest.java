@@ -58,16 +58,17 @@ public class ParseHttpRequest {
         assignFileType(serverPath);
 
         responder.setFilePath(serverPath);
-
         if (!FilePathing.checkFileScriptAliased(identifier)) {
             if (!prepareResponse(serverPath)) {
                 return;
             }
         } else {
-            System.out.println(">Script");
+            responder.setIsScript();
+            String queryString = FilePathing.getQueryString(identifier);
+            if (!CGIScript.executeScript(serverPath, queryString, this)) {
+                return;
+            }
         }
-        //needs to add other error code via checking, if not it will always be 200
-        //thinking to remove this and let HttpResponse to handle statusCode instead
         System.out.println("------- Parsing Request Done -------");
 
         return;
@@ -85,8 +86,6 @@ public class ParseHttpRequest {
             return false;
         }
 
-        System.out.println(">" + responder);
-        System.out.println(">" + methodLine[0]);
         responder.setRequestMethod(methodLine[0]);
 
         method = methodLine[0];
@@ -201,7 +200,7 @@ public class ParseHttpRequest {
             HttpMethod httpMethod = (HttpMethod) (Class.forName("Server.HttpMethods." + requestMethodClass).newInstance());
             httpMethod.execute(serverPath, responder);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            responder.setStatusCode("500");
             return false;
         }
         return true;
@@ -225,6 +224,10 @@ public class ParseHttpRequest {
 
     public HashMap getHeaderMap() {
         return this.headerMap;
+    }
+
+    public HttpResponse getResponder() {
+        return this.responder;
     }
 
     public String getBody() {
