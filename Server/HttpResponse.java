@@ -49,7 +49,7 @@ public class HttpResponse {
             out.print("Last-Modified: " + ResponseDictionary.getDateModified() + "\r\n");
         }
 
-        if (!isScript) {
+        if (!isScript && contentType != null && contentLength != null) {
             out.print("Content-Type: " + contentType + "\r\n");
             out.print("Content-Length: " + contentLength + "\r\n");
         }
@@ -60,21 +60,12 @@ public class HttpResponse {
         //very important
         out.flush();
 
-        if (responseBody != null) {
-            out.print(responseBody + "\r\n");
-        }
-        responseBody = null;
-
         if (outputStream != null) {
             outputStream.write(responseByte);
             out.print("\r\n");
         }
         outputStream.flush();
 
-        /**if (filePath != null) {
-            File outFile = new File(filePath);
-            out.print(filePath + "\r\n");
-        }**/
         out.flush();
         //Logger logger = new Logger(requestParser);
     }
