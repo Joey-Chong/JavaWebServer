@@ -12,8 +12,10 @@ import java.util.Map.Entry;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 
 public class CGIScript {
@@ -37,8 +39,11 @@ public class CGIScript {
             //assert operatingBuilder.redirectOutput().file() == log;
             //assert operation.getInputStream().read() == -1;
 
-            if (!redirectOutput(operation, parser.getResponder())) {
+            if (!assignInput(operation, parser)) {
                 parser.getResponder().setStatusCode("500");
+                return false;
+            }
+            if (!redirectOutput(operation, parser.getResponder())) {
                 return false;
             }
             
@@ -65,6 +70,17 @@ public class CGIScript {
                 String key = "HTTP_" + ((String)mapElement.getKey()).toUpperCase();
                 environmentMap.put(key, (String)mapElement.getValue());
             } 
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean assignInput(Process operation, ParseHttpRequest parser) {
+        try {
+            BufferedWriter redirectWriter = new BufferedWriter(new OutputStreamWriter(operation.getOutputStream()));
+            redirectWriter.write(parser.getBody());
+            redirectWriter.flush();
         } catch (Exception e) {
             return false;
         }

@@ -49,7 +49,7 @@ public class ParseHttpRequest {
         if (!handleAccessFiles(serverPath)) {
             return;
         }
-        
+
         if (!FilePathing.checkFileExists(serverPath)) {
             responder.setStatusCode("404");
             return;
@@ -69,8 +69,6 @@ public class ParseHttpRequest {
                 return;
             }
         }
-        //needs to add other error code via checking, if not it will always be 200
-        //thinking to remove this and let HttpResponse to handle statusCode instead
         System.out.println("------- Parsing Request Done -------");
 
         return;
@@ -202,7 +200,7 @@ public class ParseHttpRequest {
             HttpMethod httpMethod = (HttpMethod) (Class.forName("Server.HttpMethods." + requestMethodClass).newInstance());
             httpMethod.execute(serverPath, responder);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
+            responder.setStatusCode("500");
             return false;
         }
         return true;
