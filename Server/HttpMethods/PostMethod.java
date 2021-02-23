@@ -3,6 +3,7 @@ package Server.HttpMethods;
 import Dictionaries.MimeSettings;
 import Server.HttpResponse;
 import Server.ParseHttpRequest;
+import Dictionaries.ResponseDictionary;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -11,32 +12,23 @@ import java.io.IOException;
 public class PostMethod extends HttpMethod{
     File file;
     FileWriter fw;
-    private String statusCode;
 
     @Override
-    public void execute(String filePath, HttpResponse response, ParseHttpRequest request) {
+    public void execute(String filePath, HttpResponse responder, ParseHttpRequest request) {
         file = new File(filePath);
 
         try {
             fw = new FileWriter(file, true);
-            if (file.exists()) {
-                System.out.println(filePath);
-                fw.write(request.getBody());
-                System.out.println("POST existed " + request.getBody());
-                statusCode = "200";
-            }
-            else {
-                statusCode = "404";
-            }
+            System.out.println(filePath);
+            fw.write(request.getBody());
+            System.out.println("POST existed " + request.getBody());
+            responder.setStatusCode("200");
             fw.flush();
             fw.close();
+            responder.setContentLength(String.valueOf(file.length()));
+            ResponseDictionary.updateDateModified();
         } catch(IOException e) {
-            statusCode = "404";
+            responder.setStatusCode("500");
         }
-    }
-
-    @Override
-    public String getStatusCode() {
-        return this.statusCode;
     }
 }

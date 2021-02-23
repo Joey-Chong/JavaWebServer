@@ -209,7 +209,6 @@ public class ParseHttpRequest {
             System.out.println(requestMethodClass);
             HttpMethod httpMethod = (HttpMethod) (Class.forName("Server.HttpMethods." + requestMethodClass).newInstance());
             httpMethod.execute(serverPath, responder, this);
-            responder.setStatusCode(httpMethod.getStatusCode());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             responder.setStatusCode("500");
             return false;

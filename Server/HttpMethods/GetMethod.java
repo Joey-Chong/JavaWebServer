@@ -13,29 +13,26 @@ public class GetMethod extends HttpMethod{
     OutputStream outputStream;
 
     @Override
-    public void execute(String filePath, HttpResponse response, ParseHttpRequest request) {
+    public void execute(String filePath, HttpResponse responder, ParseHttpRequest request) {
         System.out.println("Creating instance GET");
 
-        outputStream = response.getOutputStream();
+        outputStream = responder.getOutputStream();
 
         file = new File(filePath);
-        response.setContentLength(String.valueOf(file.length()));
+        responder.setContentLength(String.valueOf(file.length()));
         System.out.println(file.length());
         System.out.println(filePath);
 
-        String contentType = response.getContentType();
+        String contentType = responder.getContentType();
         System.out.println("content type: " + contentType);
         try {
             byte[] fileBytes = Files.readAllBytes(Paths.get(filePath));
-            response.setResponseByte(fileBytes);
+            responder.setResponseByte(fileBytes);
+            responder.setStatusCode("200");
             System.out.println("file bytes here: " + fileBytes);
         } catch (IOException e) {
             e.printStackTrace();
+            responder.setStatusCode("500");
         }
-    }
-
-    @Override
-    public String getStatusCode() {
-        return null;
     }
 }
