@@ -28,6 +28,9 @@ public class ParseHttpRequest {
     private HttpResponse responder;
 
     public ParseHttpRequest(Socket client, HttpResponse responder) throws IOException {
+        System.out.println();
+        System.out.println("------------------Server started------------------------");
+        System.out.println();
         this.remoteAddress = client.getRemoteSocketAddress().toString();
         this.responder = responder;
         reader = new BufferedReader(new InputStreamReader(client.getInputStream()));

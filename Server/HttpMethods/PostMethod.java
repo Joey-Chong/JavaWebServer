@@ -1,5 +1,6 @@
 package Server.HttpMethods;
 
+import Dictionaries.MimeSettings;
 import Server.HttpResponse;
 import Server.ParseHttpRequest;
 
@@ -7,7 +8,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class PutMethod extends HttpMethod{
+public class PostMethod extends HttpMethod{
     File file;
     FileWriter fw;
     private String statusCode;
@@ -17,22 +18,22 @@ public class PutMethod extends HttpMethod{
         file = new File(filePath);
 
         try {
-            fw = new FileWriter(file, false);
+            fw = new FileWriter(file, true);
             if (file.exists()) {
-                fw.write(request.getBody());
-                System.out.println("PUT existed " + request.getBody());
-                statusCode = "200";
-            } else {
+                System.out.println(filePath);
+                System.out.println(MimeSettings.getExtension(request.getContentType()));
                 file.createNewFile();
-                System.out.println("------- File Created -------");
                 fw.write(request.getBody());
-                System.out.println("PUT " + request.getBody());
-                statusCode = "201";
+                System.out.println("POST existed " + request.getBody());
+                statusCode = "200";
+            }
+            else {
+                statusCode = "404";
             }
             fw.flush();
             fw.close();
         } catch(IOException e) {
-            statusCode = "400";
+            statusCode = "404";
         }
     }
 
