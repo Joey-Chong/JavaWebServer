@@ -3,7 +3,8 @@
 # Absolute path to the location of the file containing the 
 # username and password pairs, in .htpassword format
 
-AuthUserFile "/Users/adam/Documents/Github/web-server-joey-adam-team/secret/.htpasswd"
+# AuthUserFile "/Users/adam/Documents/Github/web-server-joey-adam-team/secret/.htpasswd"
+AuthUserFile "/Users/joeychong/Documents/web-server-joey-adam-team/secret/.htpasswd"
 
 # AuthUserFile "/Users/adam/Documents/Github/web-server-joey-adam-team/secret/.htpasswd"
 

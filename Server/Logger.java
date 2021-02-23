@@ -35,8 +35,6 @@ public class Logger {
         //get response body length
 
         path = "";
-//        placeholder path
-//        path = "C:\\Users\\joey_\\IdeaProjects\\web-server-joey-adam-team\\";
         path = ConfSettings.getConfiguration("LogFile");    //real path
         String fileName = path + "log.txt";
 
