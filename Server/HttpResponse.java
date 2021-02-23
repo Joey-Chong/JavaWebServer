@@ -16,7 +16,6 @@ public class HttpResponse {
     private ParseHttpRequest requestParser;
     OutputStream outputStream;
 
-
     private String statusCode;
     private String requestMethod;
     private String contentType;
@@ -29,7 +28,7 @@ public class HttpResponse {
     public HttpResponse(Socket socket) throws IOException {
         outputStream = socket.getOutputStream();
         out = new PrintWriter(socket.getOutputStream(), true);
-        statusCode = "200";
+//        statusCode = "200";
         isScript = false;
     }
 

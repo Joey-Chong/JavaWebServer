@@ -2,6 +2,7 @@ package Server.HttpMethods;
 
 import Server.FilePathing;
 import Server.HttpResponse;
+import Server.ParseHttpRequest;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,7 +13,7 @@ public class GetMethod extends HttpMethod{
     OutputStream outputStream;
 
     @Override
-    public void execute(String filePath, HttpResponse response) {
+    public void execute(String filePath, HttpResponse response, ParseHttpRequest request) {
         System.out.println("Creating instance GET");
 
         outputStream = response.getOutputStream();
@@ -31,20 +32,6 @@ public class GetMethod extends HttpMethod{
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-//        else {
-//            try {
-//                String body = "";
-//                BufferedReader reader = new BufferedReader(new FileReader(file));
-//                String line = "";
-//                while ((line = reader.readLine()) != null) {
-//                    body += line + "\n";
-//                }
-//                response.setResponseBody(body);
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
     }
 
     @Override

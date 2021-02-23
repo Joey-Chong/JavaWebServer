@@ -10,6 +10,7 @@ import Dictionaries.MimeSettings;
 import Dictionaries.MethodTable;
 import Server.HttpMethods.HttpMethod;
 import java.io.File;
+import java.util.Locale;
 
 public class ParseHttpRequest {
     private String remoteAddress;
@@ -50,7 +51,7 @@ public class ParseHttpRequest {
             return;
         }
 
-        if (!FilePathing.checkFileExists(serverPath)) {
+        if (!FilePathing.checkFileExists(serverPath) && !method.equals("PUT")) {
             responder.setStatusCode("404");
             return;
         }
@@ -121,6 +122,12 @@ public class ParseHttpRequest {
                 headerMap.put(headerLine[0], headerLine[1]);
             }
 
+            for (String name: headerMap.keySet()){
+                String key = name.toString();
+                String value = headerMap.get(name).toString();
+                System.out.println(key + " " + value);
+            }
+
         }
         return true;
     }
@@ -149,7 +156,6 @@ public class ParseHttpRequest {
                 responder.setStatusCode("400");
                 return false;
             }
-            System.out.println(body);
         }
         else {
             hasBody = false;
@@ -197,8 +203,10 @@ public class ParseHttpRequest {
         try {
             MethodTable.init();
             String requestMethodClass = MethodTable.get(method);
+            System.out.println(requestMethodClass);
             HttpMethod httpMethod = (HttpMethod) (Class.forName("Server.HttpMethods." + requestMethodClass).newInstance());
-            httpMethod.execute(serverPath, responder);
+            httpMethod.execute(serverPath, responder, this);
+            responder.setStatusCode(httpMethod.getStatusCode());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             responder.setStatusCode("500");
             return false;
