@@ -28,17 +28,9 @@ public class CGIScript {
                 parser.getResponder().setStatusCode("500");
                 return false;
             }
-            //File log = new File("log");
-            //PrintWriter writer = new PrintWriter(log);
-            //writer.print("");
-            //writer.close();
-            //operatingBuilder.redirectErrorStream(true);
-            //operatingBuilder.redirectOutput(Redirect.appendTo(log));
+            
             Process operation = operatingBuilder.start();
-            //assert operatingBuilder.redirectInput() == Redirect.PIPE;
-            //assert operatingBuilder.redirectOutput().file() == log;
-            //assert operation.getInputStream().read() == -1;
-
+            
             if (!assignInput(operation, parser)) {
                 parser.getResponder().setStatusCode("500");
                 return false;
@@ -46,12 +38,6 @@ public class CGIScript {
             if (!redirectOutput(operation, parser.getResponder())) {
                 return false;
             }
-            
-            /**BufferedReader reader = new BufferedReader(new FileReader(log));
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                body += line + "\n";
-            }**/
         } catch (Exception e) {
             parser.getResponder().setStatusCode("500");
             return false;
@@ -79,8 +65,14 @@ public class CGIScript {
     private static boolean assignInput(Process operation, ParseHttpRequest parser) {
         try {
             BufferedWriter redirectWriter = new BufferedWriter(new OutputStreamWriter(operation.getOutputStream()));
+            if (parser.getBody() == null && (parser.getMethod().equals("PUT") || parser.getMethod().equals("POST"))) {
+                return false;
+            } else if (parser.getBody() == null && !parser.getMethod().equals("PUT") && !parser.getMethod().equals("POST")) {
+                return true;
+            }
             redirectWriter.write(parser.getBody());
             redirectWriter.flush();
+            redirectWriter.close();
         } catch (Exception e) {
             return false;
         }
@@ -97,7 +89,8 @@ public class CGIScript {
                 bodyBuilder.append("\n");
             }
             String outputBody = bodyBuilder.toString();
-            responder.setResponseBody(outputBody);
+            byte[] outputBytes = outputBody.getBytes();
+            responder.setResponseByte(outputBytes);
         } catch (Exception e) {
             responder.setStatusCode("500");
             return false;

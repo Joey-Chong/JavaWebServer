@@ -29,7 +29,7 @@ public class ParseHttpRequest {
 
     public ParseHttpRequest(Socket client, HttpResponse responder) throws IOException {
         System.out.println();
-        System.out.println("------------------Server started------------------------");
+        System.out.println("------------------Accepting Client Input------------------------");
         System.out.println();
         this.remoteAddress = client.getRemoteSocketAddress().toString();
         this.responder = responder;
@@ -154,7 +154,7 @@ public class ParseHttpRequest {
                 }
             }
             System.out.println("------- End of Body -------");
-            if(body.length() != contentLength) {
+            if(body.getBytes().length != contentLength) {
                 System.out.println("------- Body length does not match Content-Length -------");
                 responder.setStatusCode("400");
                 return false;

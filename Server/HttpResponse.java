@@ -9,6 +9,7 @@ import Dictionaries.MethodTable;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 public class HttpResponse {
 
@@ -48,13 +49,16 @@ public class HttpResponse {
             out.print("Last-Modified: " + ResponseDictionary.getDateModified() + "\r\n");
         }
 
-        if (!isScript && contentType != null && contentLength != null) {
+        if (!isScript) {
             out.print("Content-Type: " + contentType + "\r\n");
             out.print("Content-Length: " + contentLength + "\r\n");
         }
 
         out.print("Connection: Closed\r\n");
-        out.print("\r\n");
+
+        if (!isScript) {
+            out.print("\r\n");
+        }
 
         //very important
         out.flush();
@@ -72,6 +76,7 @@ public class HttpResponse {
     private void printDate() {
         Date currentDate = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("E, yyyy MM dd hh:mm:ss zzz");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         out.print("Date: " + dateFormat.format(currentDate) + "\r\n");
     }
 

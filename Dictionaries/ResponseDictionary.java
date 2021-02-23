@@ -3,6 +3,7 @@ package Dictionaries;
 import java.util.HashMap;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 public class ResponseDictionary {
 
@@ -31,6 +32,7 @@ public class ResponseDictionary {
     public static void updateDateModified() {
         Date currentDate = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("E, yyyy MM dd hh:mm:ss zzz");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         dateModified = dateFormat.format(currentDate);
     }
 
